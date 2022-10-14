@@ -192,7 +192,11 @@ class ivf_pq_test : public ::testing::TestWithParam<ivf_pq_inputs> {
   template <typename BuildIndex>
   auto run(BuildIndex build_index)
   {
-    auto index = build_index();
+    {
+      auto index = build_index();
+      ivf_pq::save(handle_, "ivf_pq_index", index);
+    }
+    auto index = ivf_pq::load<IdxT>(handle_, "ivf_pq_index");
 
     size_t queries_size = ps.num_queries * ps.k;
     std::vector<IdxT> indices_ivf_pq(queries_size);

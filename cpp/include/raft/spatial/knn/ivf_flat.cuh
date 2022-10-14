@@ -16,6 +16,10 @@
 
 #pragma once
 
+#include <fstream>
+#include <iostream>
+#include <string>
+
 #include "detail/ivf_flat_build.cuh"
 #include "detail/ivf_flat_search.cuh"
 #include "ivf_flat_types.hpp"
@@ -382,6 +386,17 @@ void search(const handle_t& handle,
                                                       neighbors.data_handle(),
                                                       distances.data_handle(),
                                                       nullptr);
+}
+template <typename T, typename IdxT>
+void save(const handle_t& handle, const std::string& filename, const index<T, IdxT>& index_)
+{
+  return raft::spatial::knn::ivf_flat::detail::save(handle, filename, index_);
+}
+
+template <typename T, typename IdxT>
+auto load(const handle_t& handle, const std::string& filename) -> index<T, IdxT>
+{
+  return raft::spatial::knn::ivf_flat::detail::load<T, IdxT>(handle, filename);
 }
 
 }  // namespace raft::spatial::knn::ivf_flat

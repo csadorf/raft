@@ -16,6 +16,10 @@
 
 #pragma once
 
+#include <fstream>
+#include <iostream>
+#include <string>
+
 #include "detail/ivf_pq_build.cuh"
 #include "detail/ivf_pq_search.cuh"
 #include "ivf_pq_types.hpp"
@@ -191,4 +195,15 @@ inline void search(const handle_t& handle,
     handle, params, index, queries, n_queries, k, neighbors, distances, mr);
 }
 
+template <typename IdxT>
+void save(const handle_t& handle, const std::string& filename, const index<IdxT>& index_)
+{
+  return raft::spatial::knn::ivf_pq::detail::save(handle, filename, index_);
+}
+
+template <typename IdxT>
+auto load(const handle_t& handle, const std::string& filename) -> index<IdxT>
+{
+  return raft::spatial::knn::ivf_pq::detail::load<IdxT>(handle, filename);
+}
 }  // namespace raft::spatial::knn::ivf_pq

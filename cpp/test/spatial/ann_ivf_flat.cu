@@ -118,6 +118,7 @@ class AnnIVFFlatTest : public ::testing::TestWithParam<AnnIvfFlatInputs<IdxT>> {
                                database.data(),
                                ps.num_db_vecs,
                                ps.dim);
+                               
         handle_.sync_stream(stream_);
         approx_knn_search(handle_,
                           distances_ivfflat_dev.data(),
@@ -154,6 +155,7 @@ class AnnIVFFlatTest : public ::testing::TestWithParam<AnnIvfFlatInputs<IdxT>> {
         auto database_view = raft::make_device_matrix_view<const DataT, IdxT>(
           (const DataT*)database.data(), ps.num_db_vecs, ps.dim);
 
+       
         auto index = ivf_flat::build_index(handle_, database_view, index_params);
 
         rmm::device_uvector<IdxT> vector_indices(ps.num_db_vecs, stream_);
@@ -175,9 +177,13 @@ class AnnIVFFlatTest : public ::testing::TestWithParam<AnnIvfFlatInputs<IdxT>> {
                          vector_indices.data() + half_of_data,
                          IdxT(ps.num_db_vecs) - half_of_data);
 
+        raft::spatial::knn::ivf_flat::save(handle_, "ivf_flat_index", index);
+    
+        auto index_loaded = raft::spatial::knn::ivf_flat::load<DataT, IdxT>(handle_, "ivf_flat_index");
+
         ivf_flat::search(handle_,
                          search_params,
-                         index_2,
+                         index_loaded,
                          search_queries.data(),
                          ps.num_queries,
                          ps.k,
